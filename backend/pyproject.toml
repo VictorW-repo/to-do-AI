@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "todo-ai"
+version = "0.1.0"
+description = "Full-stack todo app with AI integration"
+authors = ["Your Name <your.email@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.104.0"
+uvicorn = {extras = ["standard"], version = "^0.34.2"}
+sqlalchemy = "^2.0"
+pydantic = "^2.4.2"
+pydantic-settings = "^2.0.3"
+strawberry-graphql = "^0.211.1"  # This includes FastAPI integration
+alembic = "^1.12.1"
+python-dotenv = "^1.0.0"
+asyncpg = "^0.28.0"
+openai = "^1.2.0"
+httpx = "^0.25.0"
+python-multipart = "^0.0.6"
+psycopg2-binary = "^2.9.9"
+aiosqlite = "^0.21.0"
+greenlet = "^3.2.0"
+websockets = "^15.0.1"
+wsproto = "^1.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+black = "^23.10.1"
+isort = "^5.12.0"
+mypy = "^1.6.1"
+pylint = "^3.0.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true

@@ -1,4 +1,3 @@
----
 
 # AI Todo App
 

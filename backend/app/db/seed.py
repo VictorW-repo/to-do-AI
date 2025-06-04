@@ -68,35 +68,42 @@ async def create_default_user(session: AsyncSession) -> User:
     return user
 
 
-async def create_sample_todos(session: AsyncSession, user_id: int) -> List[Todo]:
+async def create_sample_todos(
+    session: AsyncSession, user_id: int, force: bool = False
+) -> List[Todo]:
     """Create sample todo items for the user"""
     result = await session.execute(select(Todo).filter(Todo.user_id == user_id))
     existing_todos = result.scalars().all()
 
-    if not existing_todos:
-        todos = []
-        for todo_data in SAMPLE_TODOS:
-            todo = Todo(user_id=user_id, **todo_data)
-            session.add(todo)
-            todos.append(todo)
+    if existing_todos and not force:
+        print(f"Found {len(existing_todos)} existing todos. Skipping seed.")
+        return existing_todos
 
+    if force and existing_todos:
+        for todo in existing_todos:
+            await session.delete(todo)
         await session.commit()
-        for todo in todos:
-            await session.refresh(todo)
-        print(f"Created {len(todos)} sample todos for user_id: {user_id}")
-        return todos
-    
-    print(f"Found {len(existing_todos)} existing todos. Skipping seed.")
-    return existing_todos
+
+    todos = []
+    for todo_data in SAMPLE_TODOS:
+        todo = Todo(user_id=user_id, **todo_data)
+        session.add(todo)
+        todos.append(todo)
+
+    await session.commit()
+    for todo in todos:
+        await session.refresh(todo)
+    print(f"Created {len(todos)} sample todos for user_id: {user_id}")
+    return todos
 
 
-async def seed_database() -> None:
+async def seed_database(force: bool = False) -> None:
     """Initialize and seed the database with sample data"""
     await initialize_database()
-    
+
     async with SessionLocal() as session:
         user = await create_default_user(session)
-        await create_sample_todos(session, user.id)
+        await create_sample_todos(session, user.id, force=force)
 
 
 if __name__ == "__main__":
@@ -106,5 +113,5 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    asyncio.run(seed_database())
+    asyncio.run(seed_database(force=args.force))
     print("Database seeding completed.")
